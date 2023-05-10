@@ -1,6 +1,9 @@
 package com.jires.Bank.app.security;
 
+import com.jires.Bank.app.domain.EmailSender;
+import com.jires.Bank.app.service.ConfirmationTokenService;
 import com.jires.Bank.app.service.CustomUserDetailsServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -13,9 +16,18 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+    @Autowired
+    private final EmailSender emailSender;
+    private final ConfirmationTokenService confirmationTokenService;
+
+    public SecurityConfig(EmailSender emailSender, ConfirmationTokenService confirmationTokenService) {
+        this.emailSender = emailSender;
+        this.confirmationTokenService = confirmationTokenService;
+    }
+
     @Bean
     public UserDetailsService userDetailsService() {
-        return new CustomUserDetailsServiceImpl();
+        return new CustomUserDetailsServiceImpl(emailSender, confirmationTokenService);
     }
 
     @Bean

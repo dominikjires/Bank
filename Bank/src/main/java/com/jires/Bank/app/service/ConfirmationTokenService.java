@@ -1,12 +1,13 @@
 package com.jires.Bank.app.service;
 import com.jires.Bank.app.domain.ConfirmationToken;
 import com.jires.Bank.app.repository.ConfirmationTokenRepository;
+import org.springframework.stereotype.Service;
 
 import java.io.*;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-
+@Service
 public class ConfirmationTokenService {
 
     private final ConfirmationTokenRepository confirmationTokenRepository;
@@ -81,8 +82,16 @@ public class ConfirmationTokenService {
 
             writer.close();
             reader.close();
-            inputFile.delete();
-            tempFile.renameTo(inputFile);
+            //Error deleting file
+            if (inputFile.delete()) {
+                if (!tempFile.renameTo(inputFile)) {
+                    System.err.println("Error renaming file");
+                    return 0;
+                }
+            } else {
+                System.err.println("Error deleting file");
+                return 0;
+            }
 
             return rowsAffected;
         } catch (IOException e) {

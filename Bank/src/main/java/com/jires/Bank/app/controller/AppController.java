@@ -2,6 +2,7 @@ package com.jires.Bank.app.controller;
 
 import com.jires.Bank.app.repository.AccountRepository;
 import com.jires.Bank.app.repository.ExchangeRateRepository;
+import com.jires.Bank.app.service.CustomUserDetailsServiceImpl;
 import com.jires.Bank.app.service.UserService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,7 +18,14 @@ import java.util.List;
 //@RequestMapping("/api")
 public class AppController {
 
+    private final CustomUserDetailsServiceImpl customUserDetailsServiceImpl;
+
+
     Boolean state = true;
+
+    public AppController(CustomUserDetailsServiceImpl customUserDetailsServiceImpl) {
+        this.customUserDetailsServiceImpl = customUserDetailsServiceImpl;
+    }
 
     @GetMapping("")
     public String viewHomePage() {
@@ -27,6 +35,12 @@ public class AppController {
     @GetMapping("/login")
     public String showLoginForm() {
         return "login";
+    }
+
+    @GetMapping("confirm")
+    public String confirm(Model model,@RequestParam("token") String token) {
+        model.addAttribute("token", customUserDetailsServiceImpl.confirmToken(token));
+        return "confirm";
     }
 
     @GetMapping("/dashboard")

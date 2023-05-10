@@ -1,6 +1,7 @@
 package com.jires.Bank.app.repository;
 import com.jires.Bank.app.domain.ConfirmationToken;
 import com.jires.Bank.app.domain.User;
+import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.time.LocalDateTime;
@@ -8,6 +9,7 @@ import java.util.Optional;
 
 import static com.jires.Bank.app.repository.UserRepository.findUser;
 
+@Repository
 public class ConfirmationTokenRepository {
 
     private static final String FILENAME = "data/tokens.txt";
