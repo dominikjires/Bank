@@ -11,21 +11,6 @@ import java.util.Objects;
 
 public class UserRepository {
 
-    public static List<User> findUsers() {
-        List<User> users = new ArrayList<>();
-        try (BufferedReader reader = new BufferedReader(new FileReader("data/users.txt"))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] parts = line.split(",");
-                User user = new User(Long.parseLong(parts[0]), parts[1], parts[2], parts[3], parts[4]);
-                users.add(user);
-            }
-        } catch (IOException e) {
-            System.err.println("Error loading users from file: " + e.getMessage());
-        }
-        return users;
-    }
-
     public static User findUser(long id) {
         try (BufferedReader reader = new BufferedReader(new FileReader("data/users.txt"))) {
             String line;
