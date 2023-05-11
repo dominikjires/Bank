@@ -43,6 +43,7 @@ public class ConfirmationTokenService {
                 String[] tokenData = line.split(",");
                 if (tokenData[0].equals(token)) {
                     ConfirmationToken confirmationToken = new ConfirmationToken(tokenData[0], LocalDateTime.parse(tokenData[1]), LocalDateTime.parse(tokenData[2]),  Long.valueOf(tokenData[4]));
+                    bufferedReader.close();
                     return Optional.of(confirmationToken);
                 }
             }
@@ -58,30 +59,31 @@ public class ConfirmationTokenService {
     public int setConfirmedAt(String token) {
         try {
             File inputFile = new File("data/tokens.txt");
-            File tempFile = new File("data/tempTokens.txt");
+            File tempFile = new File("data/tokens_temp.txt");
 
-            BufferedReader reader = new BufferedReader(new FileReader(inputFile));
-            BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile));
+            BufferedReader reader1 = new BufferedReader(new FileReader(inputFile));
+            BufferedWriter writer1 = new BufferedWriter(new FileWriter(tempFile));
 
             String line;
             int rowsAffected = 0;
 
-            while ((line = reader.readLine()) != null) {
+            while ((line = reader1.readLine()) != null) {
                 String[] tokenData = line.split(",");
                 if (tokenData[0].equals(token)) {
-                    writer.write(tokenData[0] + "," + tokenData[1] + ","
+                    writer1.write(tokenData[0] + "," + tokenData[1] + ","
                             + tokenData[2] + "," + LocalDateTime.now() + ","
                             + tokenData[4]);
-                    writer.newLine();
+                    writer1.newLine();
                     rowsAffected++;
                 } else {
-                    writer.write(line);
-                    writer.newLine();
+                    writer1.write(line);
+                    writer1.newLine();
                 }
             }
 
-            writer.close();
-            reader.close();
+            writer1.close();
+            reader1.close();
+
             //Error deleting file
             if (inputFile.delete()) {
                 if (!tempFile.renameTo(inputFile)) {
@@ -99,4 +101,5 @@ public class ConfirmationTokenService {
             return 0;
         }
     }
+
 }

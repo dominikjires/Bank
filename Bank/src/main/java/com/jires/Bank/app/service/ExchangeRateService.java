@@ -23,7 +23,7 @@ public class ExchangeRateService {
     private final String FILEPATH = "src/main/resources/";
     private final String URL = "https://www.cnb.cz/cs/financni-trhy/devizovy-trh/kurzy-devizoveho-trhu/kurzy-devizoveho-trhu/denni_kurz.txt";
 
-    @Scheduled(cron = "0 0 15 ? * MON-FRI", zone = "Europe/Prague")
+    @Scheduled(cron = "0 00 15 ? * MON-FRI", zone = "Europe/Prague")
     public void refreshExchangeFile() throws IOException {
         String htmlContent = getHtmlContent(URL);
 

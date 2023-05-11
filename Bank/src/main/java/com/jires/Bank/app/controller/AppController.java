@@ -37,7 +37,7 @@ public class AppController {
         return "login";
     }
 
-    @GetMapping("confirm")
+    @GetMapping("/confirm")
     public String confirm(Model model,@RequestParam("token") String token) {
         model.addAttribute("token", customUserDetailsServiceImpl.confirmToken(token));
         return "confirm";

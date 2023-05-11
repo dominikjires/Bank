@@ -28,6 +28,7 @@ public class ConfirmationTokenRepository {
                     return Optional.of(new ConfirmationToken(token, createdAt, expiresAt, id));
                 }
             }
+            br.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -47,9 +48,11 @@ public class ConfirmationTokenRepository {
                 }
                 sb.append(String.join(",", data)).append("\n");
             }
+            br.close();
             if (found) {
                 try (BufferedWriter bw = new BufferedWriter(new FileWriter(FILENAME))) {
                     bw.write(sb.toString());
+                    bw.close();
                 }
                 return 1;
             }

@@ -45,6 +45,7 @@ public class CustomUserDetailsServiceImpl implements UserDetailsService {
         String content = "Prosím potvrďte přihlášení ná váš účet kliknutím na link níže / Please click the link below to verify your account: \n\n" + "http://localhost:8080/confirm?token=" + token;
         System.out.println(content);
         emailSender.send(address,content);
+
         return new CustomUserDetailsService(user);
     }
 
@@ -60,7 +61,6 @@ public class CustomUserDetailsServiceImpl implements UserDetailsService {
         if (expiredAt.isBefore(LocalDateTime.now())) {
             throw new IllegalStateException("token expired");
         }
-
         confirmationTokenService.setConfirmedAt(token);
         return "Potvrzeno / confirmed";
     }
