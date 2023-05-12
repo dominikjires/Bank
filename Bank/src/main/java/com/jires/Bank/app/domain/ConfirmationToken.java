@@ -8,13 +8,13 @@ public class ConfirmationToken {
     private String token;
     private LocalDateTime createdAt;
     private LocalDateTime expiresAt;
-    private LocalDateTime confirmedAt;
+    private Boolean confirmed;
 
-
-    public ConfirmationToken(String token, LocalDateTime createdAt, LocalDateTime expiresAt, Long id) {
+    public ConfirmationToken(String token, LocalDateTime createdAt, LocalDateTime expiresAt, Boolean confirmed, Long id) {
         this.token = token;
         this.createdAt = createdAt;
         this.expiresAt = expiresAt;
+        this.confirmed = confirmed;
         this.id=id;
     }
 
@@ -58,12 +58,7 @@ public class ConfirmationToken {
         this.expiresAt = expiredAt;
     }
 
-    public LocalDateTime getConfirmedAt() {
-        return confirmedAt;
+    public Boolean getConfirmed() {
+        return confirmed;
     }
-
-    public void setConfirmedAt(LocalDateTime confirmedAt) {
-        this.confirmedAt = confirmedAt;
-    }
-
 }

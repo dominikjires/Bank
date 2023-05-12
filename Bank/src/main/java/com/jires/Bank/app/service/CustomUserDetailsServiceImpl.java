@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.UUID;
 
 
@@ -21,6 +22,7 @@ public class CustomUserDetailsServiceImpl implements UserDetailsService {
 
     private final EmailSender emailSender;
     private final ConfirmationTokenService confirmationTokenService;
+
 
     public CustomUserDetailsServiceImpl(EmailSender emailSender, ConfirmationTokenService confirmationTokenService) {
         this.emailSender = emailSender;
@@ -38,21 +40,29 @@ public class CustomUserDetailsServiceImpl implements UserDetailsService {
 
         String token = UUID.randomUUID().toString();
 
-        ConfirmationToken confirmationToken = new ConfirmationToken(token, LocalDateTime.now(),LocalDateTime.now().plusMinutes(15),user.getId());
+        ConfirmationToken confirmationToken = new ConfirmationToken(token, LocalDateTime.now(),LocalDateTime.now().plusMinutes(15),false,user.getId());
         ConfirmationTokenService.saveConfirmationToken(confirmationToken);
         System.out.println(token);
         String address = user.getEmail();
         String content = "Prosím potvrďte přihlášení ná váš účet kliknutím na link níže / Please click the link below to verify your account: \n\n" + "http://localhost:8080/confirm?token=" + token;
         System.out.println(content);
         emailSender.send(address,content);
-
+        Optional<ConfirmationToken> optionalToken = confirmationTokenService.getToken(token);
+        while (!optionalToken.isPresent() || !optionalToken.get().getConfirmed()) {
+            optionalToken = confirmationTokenService.getToken(token);
+            try {
+                Thread.sleep(2000); // počkej 2 sekundy
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
         return new CustomUserDetailsService(user);
     }
 
     public String confirmToken(String token) {
         ConfirmationToken confirmationToken = confirmationTokenService.getToken(token).orElseThrow(() -> new IllegalStateException("token not found"));
 
-        if (confirmationToken.getConfirmedAt() != null) {
+        if (confirmationToken.getConfirmed()) {
             throw new IllegalStateException("email already confirmed");
         }
 
