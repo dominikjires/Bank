@@ -8,7 +8,7 @@ public class PasswordEncoder {
     public static void main(String[] args) {
         // Create a new instance of the BCryptPasswordEncoder class
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-        String rawPassword = "1234";
+        String rawPassword = "heslo";
 
         // Encode the raw password using the encoder object
         String encodedPassword = encoder.encode(rawPassword);
