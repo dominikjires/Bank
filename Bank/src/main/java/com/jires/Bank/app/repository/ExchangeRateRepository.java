@@ -18,11 +18,14 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class ExchangeRateRepository {
 
+    // Method to retrieve exchange rates from file
     public static List<ExchangeRate> getExchangeRates() throws IOException {
         List<ExchangeRate> exchangeRates = new ArrayList<>();
 
+        // Read exchange rate data from file
         String[][] exchangeRateArray = readExchangeFile();
 
+        // Create ExchangeRate object for each line and add to the list
         for (String[] exchangeRate : exchangeRateArray) {
             ExchangeRate exRate = new ExchangeRate(
                     exchangeRate[0],
@@ -31,11 +34,11 @@ public class ExchangeRateRepository {
                     exchangeRate[3],
                     exchangeRate[4]
             );
-            exchangeRates.add(exRate);
         }
         return exchangeRates;
     }
 
+    // Method to get HTML content from a URL using HTTP GET request
     public static String getHtmlContent(String url) {
         CloseableHttpClient httpClient = HttpClients.createDefault();
         HttpGet request = new HttpGet(url);
@@ -50,6 +53,7 @@ public class ExchangeRateRepository {
         return null;
     }
 
+    // Method to print a 2D string array
     public static void printArray(String[][] text) {
         for (int i = 0; i < text.length; i++) {
             for (int j = 0; j < text[i].length; j++) {
@@ -59,6 +63,7 @@ public class ExchangeRateRepository {
         }
     }
 
+    // Method to retrieve exchange rate data for a specific currency
     public static String[] getExchangeRate(String currency) throws IOException {
         String[][] read = readExchangeFile();
         for (int i = 0; i < read.length; i++) {
@@ -69,15 +74,18 @@ public class ExchangeRateRepository {
         return null;
     }
 
+    // Method to read exchange rate data from file and return as 2D string array
     public static String[][] readExchangeFile() throws IOException {
         List<String> edit = Files.readAllLines(Paths.get("src/main/resources/exchangeRate.txt"));
         List<String[]> outputList = new ArrayList<>();
 
-        for (int i = 3; i < edit.size(); i++) {
+        // Iterate over lines of data and split into array of fields
+        for (int i = 3; i < 34; i++) {
             String[] line = edit.get(i).split("\\|");
             outputList.add(line);
         }
 
+        // Convert list of string arrays to 2D string array
         String[][] output = new String[outputList.size()][];
         for (int i = 0; i < outputList.size(); i++) {
             output[i] = outputList.get(i);
@@ -86,9 +94,8 @@ public class ExchangeRateRepository {
         return output;
     }
 
-
     public static void main(String[] args) throws IOException {
+        // Example usage: print exchange rate data to console
         printArray(readExchangeFile());
-
     }
 }

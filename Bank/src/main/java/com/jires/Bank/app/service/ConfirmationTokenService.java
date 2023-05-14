@@ -1,8 +1,8 @@
 package com.jires.Bank.app.service;
+
 import com.jires.Bank.app.domain.ConfirmationToken;
 import com.jires.Bank.app.repository.ConfirmationTokenRepository;
 import org.springframework.stereotype.Service;
-
 import java.io.*;
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -16,6 +16,7 @@ public class ConfirmationTokenService {
         this.confirmationTokenRepository = confirmationTokenRepository;
     }
 
+    // This method saves the confirmation token to a file
     public static void saveConfirmationToken(ConfirmationToken token) {
         try {
             File file = new File("data/tokens.txt");
@@ -32,6 +33,7 @@ public class ConfirmationTokenService {
         }
     }
 
+    // This method retrieves a confirmation token from the file using the token string
     public Optional<ConfirmationToken> getToken(String token) {
         try {
             File file = new File("data/tokens.txt");
@@ -56,6 +58,7 @@ public class ConfirmationTokenService {
         return Optional.empty();
     }
 
+    // This method updates the confirmation status of a token in the file
     public int setConfirmedAt(String token) {
         try {
             File inputFile = new File("data/tokens.txt");
@@ -89,7 +92,6 @@ public class ConfirmationTokenService {
             writer1.close();
             reader1.close();
 
-            //Error deleting file
             if (inputFile.delete()) {
                 if (!tempFile.renameTo(inputFile)) {
                     System.err.println("Error renaming file");
@@ -107,6 +109,7 @@ public class ConfirmationTokenService {
         }
     }
 
+    // This method checks if a token is confirmed
     public boolean isTokenConfirmed(String token) {
         Optional<ConfirmationToken> optionalToken = confirmationTokenRepository.getToken(token);
         if (optionalToken.isPresent()) {
@@ -117,6 +120,7 @@ public class ConfirmationTokenService {
         }
     }
 
+    // Main method for testing
     public static void main(String[] args) {
         ConfirmationTokenRepository confirmationTokenRepository = new ConfirmationTokenRepository();
         ConfirmationTokenService confirmationTokenService = new ConfirmationTokenService(confirmationTokenRepository);

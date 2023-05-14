@@ -16,36 +16,40 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+
+    // Autowired dependencies for email sending and token confirmation service
     @Autowired
     private final EmailSender emailSender;
     private final ConfirmationTokenService confirmationTokenService;
 
+    // Constructor to set autowired dependencies
     public SecurityConfig(EmailSender emailSender, ConfirmationTokenService confirmationTokenService) {
         this.emailSender = emailSender;
         this.confirmationTokenService = confirmationTokenService;
     }
 
+    // Bean to return custom user details service
     @Bean
     public UserDetailsService userDetailsService() {
         return new CustomUserDetailsServiceImpl(emailSender, confirmationTokenService);
     }
 
+    // Bean to return BCrypt password encoder
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
-
     }
 
+    // Bean to return DAO authentication provider
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
         authProvider.setUserDetailsService(userDetailsService());
         authProvider.setPasswordEncoder(passwordEncoder());
-
         return authProvider;
-
     }
 
+    // Bean to configure HTTP security and set login and logout URLs and parameters
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http

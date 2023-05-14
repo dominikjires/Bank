@@ -1,11 +1,11 @@
 package com.jires.Bank.app.repository;
+
 import com.jires.Bank.app.domain.ConfirmationToken;
 import com.jires.Bank.app.domain.User;
 import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.time.LocalDateTime;
-import java.util.Objects;
 import java.util.Optional;
 
 import static com.jires.Bank.app.repository.UserRepository.findUser;
@@ -15,6 +15,7 @@ public class ConfirmationTokenRepository {
 
     private static final String FILENAME = "data/tokens.txt";
 
+    // Finds the confirmation token by token string.
     public Optional<ConfirmationToken> findByToken(String token) {
         try (BufferedReader br = new BufferedReader(new FileReader(FILENAME))) {
             String line;
@@ -36,6 +37,7 @@ public class ConfirmationTokenRepository {
         return Optional.empty();
     }
 
+    // Updates the confirmed timestamp of a confirmation token.
     public int updateConfirmedAt(String token, LocalDateTime confirmedAt) {
         try (BufferedReader br = new BufferedReader(new FileReader(FILENAME))) {
             StringBuilder sb = new StringBuilder();
@@ -63,6 +65,7 @@ public class ConfirmationTokenRepository {
         return 0;
     }
 
+    // Gets the confirmation token by token string.
     public Optional<ConfirmationToken> getToken(String token) {
         try {
             File file = new File("data/tokens.txt");
@@ -73,9 +76,9 @@ public class ConfirmationTokenRepository {
             while ((line = bufferedReader.readLine()) != null) {
                 String[] tokenData = line.split(",");
                 if (tokenData[0].equals(token)) {
-                        ConfirmationToken confirmationToken = new ConfirmationToken(tokenData[0], LocalDateTime.parse(tokenData[1]), LocalDateTime.parse(tokenData[2]),Boolean.parseBoolean(tokenData[3]),  Long.valueOf(tokenData[4]));
-                        bufferedReader.close();
-                        return Optional.of(confirmationToken);
+                    ConfirmationToken confirmationToken = new ConfirmationToken(tokenData[0], LocalDateTime.parse(tokenData[1]), LocalDateTime.parse(tokenData[2]),Boolean.parseBoolean(tokenData[3]),  Long.valueOf(tokenData[4]));
+                    bufferedReader.close();
+                    return Optional.of(confirmationToken);
                 }
             }
             bufferedReader.close();
@@ -86,5 +89,4 @@ public class ConfirmationTokenRepository {
         return Optional.empty();
     }
 }
-
 

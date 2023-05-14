@@ -2,14 +2,14 @@ package com.jires.Bank.app.domain;
 
 import java.time.LocalDateTime;
 
-
 public class ConfirmationToken {
-    private Long id;
-    private String token;
-    private LocalDateTime createdAt;
-    private LocalDateTime expiresAt;
-    private Boolean confirmed;
+    private Long id;  // id of the token
+    private String token;  // actual token string
+    private LocalDateTime createdAt;  // time when the token was created
+    private LocalDateTime expiresAt;  // time when the token expires
+    private Boolean confirmed;  // whether the token has been confirmed
 
+    // Constructor with parameters
     public ConfirmationToken(String token, LocalDateTime createdAt, LocalDateTime expiresAt, Boolean confirmed, Long id) {
         this.token = token;
         this.createdAt = createdAt;
@@ -18,6 +18,7 @@ public class ConfirmationToken {
         this.id=id;
     }
 
+    // Getters and setters
     public Long getId() {
         return id;
     }

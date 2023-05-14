@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AccountRepository {
+
+    // Finds accounts for the given user ID
     public static List<Account> findAccountsByUserId(long id) {
         List<Account> accounts = new ArrayList<>();
         try (BufferedReader reader = new BufferedReader(new FileReader("data/" + id + ".txt"))) {
@@ -24,12 +26,12 @@ public class AccountRepository {
         return accounts;
     }
 
+    // Main method for testing
     public static void main(String[] args) {
         List<Account> accounts = new ArrayList<>();
         accounts = findAccountsByUserId(1);
         System.out.println(accounts);
     }
 }
-
 
 
