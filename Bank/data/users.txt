@@ -1,3 +1,0 @@
-1,John,Doe,john.doe@example.com,$2a$10$hFUeuS1gRvkMKYLS3OHBoeO0Jbu1ZwB9T8NDupwttZV4NZsnVBWNW
-2,Jane,Doe,jane.doe@example.com,$2a$10$9VN3fJwercnQ4zzGGrDHZu72.hWlYGJ5Dp.ih6lQVyoAHvw9RIyAu
-3,Dominik,Jires,jiresdom@gmail.com,$2a$10$ExmBhcMkfq2M7/zEmV69fuIVjjNvLtYm2VLLTiEhc2xk7ebq0cTfy
