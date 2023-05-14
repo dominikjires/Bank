@@ -34,6 +34,7 @@ public class ExchangeRateRepository {
                     exchangeRate[3],
                     exchangeRate[4]
             );
+            exchangeRates.add(exRate);
         }
         return exchangeRates;
     }
@@ -96,6 +97,9 @@ public class ExchangeRateRepository {
 
     public static void main(String[] args) throws IOException {
         // Example usage: print exchange rate data to console
-        printArray(readExchangeFile());
+        List<ExchangeRate> exchangeRates = getExchangeRates();
+        for (ExchangeRate exchangeRate : exchangeRates) {
+            System.out.println(exchangeRate.getExchangeRate() + exchangeRate.getCode());
+        }
     }
 }
