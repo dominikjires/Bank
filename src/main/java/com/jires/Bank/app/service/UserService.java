@@ -146,6 +146,7 @@ public class UserService {
                         String[] parts = line.split(",");
                         double convertedAmount = calculateExchange(type, amount);
                         if (Double.parseDouble(parts[1].trim()) - convertedAmount < 0) {
+                            reader2.close();
                             return 0;
                         } else {
                             newAmount = Double.parseDouble(parts[1].trim()) - convertedAmount;
