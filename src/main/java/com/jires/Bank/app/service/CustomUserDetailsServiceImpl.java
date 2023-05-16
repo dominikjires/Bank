@@ -52,9 +52,8 @@ public class CustomUserDetailsServiceImpl implements UserDetailsService {
 
         // Send an email to the user containing a link to confirm their account
         String address = user.getEmail();
-        String content = "Prosím potvrďte přihlášení ná váš účet kliknutím na link níže / Please click the link below to verify your account: \n\n" + "<a href='https://bank-application.herokuapp.com/confirm?token=" + token + "'>https://bank-application.herokuapp.com/confirm?token=" + token + "</a>";
+        String content = "Prosím potvrďte přihlášení ná váš účet kliknutím na link níže / Please click the link below to verify your account: \n\n" + "<a href='http://localhost:8080/confirm?token=" + token + "'>http://localhost:8080/confirm?token=" + token + "</a>";
         emailSender.send(address,content);
-        // For testing in localhost
         System.out.println("http://localhost:8080/confirm?token=" + token);
 
         // Wait for the user to confirm their account by checking the confirmation token

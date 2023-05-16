@@ -64,4 +64,8 @@ public class User {
             System.err.println("Error loading accounts from file: " + e.getMessage());
         }
     }
+
+    public List<Account> getAccounts() {
+        return accounts;
+    }
 }
