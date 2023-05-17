@@ -21,7 +21,7 @@ public class ExchangeRateService {
     private final String URL = "https://www.cnb.cz/cs/financni-trhy/devizovy-trh/kurzy-devizoveho-trhu/kurzy-devizoveho-trhu/denni_kurz.txt";
 
     // This method refreshes the exchange rate file on weekdays at 3 PM
-    @Scheduled(cron = "0 37 17 ? * MON-FRI", zone = "Europe/Prague")
+    @Scheduled(cron = "0 00 16 ? * MON-FRI", zone = "Europe/Prague")
     public void refreshExchangeFile() throws IOException {
         // Get the HTML content of the exchange rate website
         String htmlContent = getHtmlContent(URL);
