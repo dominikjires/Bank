@@ -1,21 +1,15 @@
 package com.jires.Bank.app.controller;
 
-import com.jires.Bank.app.domain.Account;
-import com.jires.Bank.app.domain.ExchangeRate;
-import com.jires.Bank.app.domain.User;
 import com.jires.Bank.app.repository.AccountRepository;
 import com.jires.Bank.app.repository.ExchangeRateRepository;
-import com.jires.Bank.app.repository.UserRepository;
 import com.jires.Bank.app.service.CustomUserDetailsServiceImpl;
 import com.jires.Bank.app.service.UserService;
-
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import com.jires.Bank.app.domain.*;
+import com.jires.Bank.app.repository.UserRepository;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.List;
@@ -23,11 +17,11 @@ import java.util.List;
 @Controller
 //@RequestMapping("/api")
 public class AppController {
-    public CustomUserDetailsServiceImpl customUserDetailsServiceImpl;
+    private final CustomUserDetailsServiceImpl customUserDetailsServiceImpl;
 
-    public Boolean state = true; // variable to store state of recent operation
+    Boolean state = true; // variable to store state of recent operation
 
-    public AppController() {
+    public AppController(CustomUserDetailsServiceImpl customUserDetailsServiceImpl) {
         this.customUserDetailsServiceImpl = customUserDetailsServiceImpl;
     }
 
@@ -97,7 +91,7 @@ public class AppController {
         List<ExchangeRate> listExchangeRates = ExchangeRateRepository.getExchangeRates();
         model.addAttribute("listExchangeRates", listExchangeRates);
 
-        return "redirect:/dashboard";
+        return "dashboard";
     }
 
     // This method handles the deposit action
