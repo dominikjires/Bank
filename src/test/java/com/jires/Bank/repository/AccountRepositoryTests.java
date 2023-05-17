@@ -21,17 +21,12 @@ public class AccountRepositoryTests {
 
     @Test
     public void testFindAccountsByUserId() {
-        // Arrange
-        long userId = 1;
+        long userId = 9;
         List<Account> expectedAccounts = List.of(
                 new Account("CZK", 1000.0),
                 new Account("CAD", 0.0)
         );
-
-        // Act
         List<Account> actualAccounts = AccountRepository.findAccountsByUserId(userId);
-
-        // Assert
         Assertions.assertEquals(expectedAccounts.size(), actualAccounts.size());
     }
 }

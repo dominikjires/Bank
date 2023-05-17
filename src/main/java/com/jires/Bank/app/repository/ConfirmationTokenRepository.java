@@ -37,34 +37,6 @@ public class ConfirmationTokenRepository {
         return Optional.empty();
     }
 
-    // Updates the confirmed timestamp of a confirmation token.
-    public int updateConfirmedAt(String token, LocalDateTime confirmedAt) {
-        try (BufferedReader br = new BufferedReader(new FileReader(FILENAME))) {
-            StringBuilder sb = new StringBuilder();
-            String line;
-            boolean found = false;
-            while ((line = br.readLine()) != null) {
-                String[] data = line.split(",");
-                if (data[1].equals(token)) {
-                    data[4] = confirmedAt == null ? "" : confirmedAt.toString();
-                    found = true;
-                }
-                sb.append(String.join(",", data)).append("\n");
-            }
-            br.close();
-            if (found) {
-                try (BufferedWriter bw = new BufferedWriter(new FileWriter(FILENAME))) {
-                    bw.write(sb.toString());
-                    bw.close();
-                }
-                return 1;
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return 0;
-    }
-
     // Gets the confirmation token by token string.
     public Optional<ConfirmationToken> getToken(String token) {
         try {

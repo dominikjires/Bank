@@ -77,7 +77,7 @@ public class ExchangeRateRepository {
 
     // Method to read exchange rate data from file and return as 2D string array
     public static String[][] readExchangeFile() throws IOException {
-        List<String> edit = Files.readAllLines(Paths.get("src/main/resources/exchangeRate.txt"));
+        List<String> edit = Files.readAllLines(Paths.get("src/main/resources/ExchangeRate.txt"));
         List<String[]> outputList = new ArrayList<>();
 
         // Iterate over lines of data and split into array of fields

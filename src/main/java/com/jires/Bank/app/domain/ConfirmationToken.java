@@ -5,6 +5,11 @@ import java.time.LocalDateTime;
 public class ConfirmationToken {
     private Long id;  // id of the token
     private String token;  // actual token string
+
+    public void setConfirmed(Boolean confirmed) {
+        this.confirmed = confirmed;
+    }
+
     private LocalDateTime createdAt;  // time when the token was created
     private LocalDateTime expiresAt;  // time when the token expires
     private Boolean confirmed;  // whether the token has been confirmed
