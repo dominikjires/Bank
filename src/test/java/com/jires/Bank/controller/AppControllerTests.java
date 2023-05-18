@@ -28,7 +28,9 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
-
+//How to get test coverage:
+//mvn clean verify
+//java -jar C:\Users\jires\Downloads\jacoco-0.8.10\lib\jacococli.jar report C:\Users\jires\IdeaProjects\Bank\target\coverage-reports\jacoco-ut.exec --classfiles C:\Users\jires\IdeaProjects\Bank\target\classes --html C:\Users\jires\IdeaProjects\Bank\target\coverage-reports
 public class AppControllerTests {
     @Mock
     private CustomUserDetailsServiceImpl customUserDetailsService;

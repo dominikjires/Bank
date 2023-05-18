@@ -46,4 +46,6 @@ public class ExchangeRateServiceTests {
         double result = exchangeService.calculateExchange("GBP", -100);
         Assertions.assertTrue(result < 0);
     }
+
+
 }

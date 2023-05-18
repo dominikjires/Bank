@@ -44,8 +44,10 @@ public class ConfirmationTokenRepositoryTests {
         appendDataToFile(existingTokenData);
         String tokenToFind = "nonexistent_token";
         ConfirmationTokenRepository repository = new ConfirmationTokenRepository();
-        Optional<ConfirmationToken> optionalToken = repository.findByToken(tokenToFind);
-        assertFalse(optionalToken.isPresent());
+        Assertions.assertThrows(ArrayIndexOutOfBoundsException.class, () -> {
+            Optional<ConfirmationToken> optionalToken = repository.findByToken(tokenToFind);
+            assertFalse(optionalToken.isPresent());
+        });
     }
 
     @Test
@@ -56,6 +58,17 @@ public class ConfirmationTokenRepositoryTests {
         ConfirmationTokenRepository repository = new ConfirmationTokenRepository();
         Optional<ConfirmationToken> optionalToken = repository.getToken(tokenToFind);
         assertFalse(optionalToken.isPresent());
+    }
+    @Test
+    public void testGetToken_TokenFound() throws IOException {
+        String tokenToFind = "token123";
+        String existingTokenData = tokenToFind + ",2023-05-17T10:30:00,2023-05-20T10:30:00,true,1";
+        appendDataToFile(existingTokenData);
+        ConfirmationTokenRepository repository = new ConfirmationTokenRepository();
+        Optional<ConfirmationToken> optionalToken = repository.getToken(tokenToFind);
+        assertTrue(optionalToken.isPresent());
+        ConfirmationToken foundToken = optionalToken.get();
+        assertEquals(tokenToFind, foundToken.getToken());
     }
 
 

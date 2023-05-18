@@ -58,8 +58,9 @@ public class UserRepository {
         return null;
     }
 
-    public static void main(String[] args) {
-        // This main method is used for testing. It finds the ID of a user with the email "jane.doe@example.com" and prints it to the console.
-        System.out.println(getId("jane.doe@example.com"));
-    }
+    // Main method gor testing
+    //public static void main(String[] args) {
+    //    // This main method is used for testing. It finds the ID of a user with the email "jane.doe@example.com" and prints it to the console.
+    //    System.out.println(getId("jane.doe@example.com"));
+    //}
 }

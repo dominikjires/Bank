@@ -3,6 +3,7 @@ package com.jires.Bank.repository;
 import com.jires.Bank.app.domain.ExchangeRate;
 import com.jires.Bank.app.repository.ExchangeRateRepository;
 import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -70,4 +71,20 @@ public class ExchangeRateRepositoryTests {
         String[] exchangeRate = ExchangeRateRepository.getExchangeRate(currency);
         assertNull(exchangeRate);
     }
+
+    @Test
+    public void testPrintArray() {
+        String[][] array = {{"A", "B", "C"}, {"D", "E", "F"}};
+        ExchangeRateRepository.printArray(array);
+    }
+
+
+    @Test
+    public void testGetHtmlContent_InvalidUrl() {
+        String invalidUrl = "http://nonexistenturl123456789.com";
+        String htmlContent = ExchangeRateRepository.getHtmlContent(invalidUrl);
+        Assertions.assertNull(htmlContent);
+    }
+
+
 }

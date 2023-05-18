@@ -59,7 +59,7 @@ public class ExchangeRateService {
     }
 
     // This is a testing method to check the calculateExchange() method
-    public static void main(String[] args) throws IOException {
-        System.out.println(calculateExchange("USD", 1000));
-    }
+    //public static void main(String[] args) throws IOException {
+        //System.out.println(calculateExchange("USD", 1000));
+    //}
 }
