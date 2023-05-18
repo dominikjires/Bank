@@ -95,11 +95,12 @@ public class ExchangeRateRepository {
         return output;
     }
 
-    public static void main(String[] args) throws IOException {
-        // Example usage: print exchange rate data to console
-        List<ExchangeRate> exchangeRates = getExchangeRates();
-        for (ExchangeRate exchangeRate : exchangeRates) {
-            System.out.println(exchangeRate.getExchangeRate() + exchangeRate.getCode());
-        }
-    }
+    // Main method gor testing
+    //public static void main(String[] args) throws IOException {
+    // Example usage: print exchange rate data to console
+    //    List<ExchangeRate> exchangeRates = getExchangeRates();
+    //    for (ExchangeRate exchangeRate : exchangeRates) {
+    //        System.out.println(exchangeRate.getExchangeRate() + exchangeRate.getCode());
+    //    }
+    //}
 }

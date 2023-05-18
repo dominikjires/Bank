@@ -188,7 +188,7 @@ public class UserService {
     }
 
     // Write a log entry for a transaction
-    private static void writeToLog(long id, String type, String currency, double amount) {
+    public static void writeToLog(long id, String type, String currency, double amount) {
         // Construct the filename for the log file based on the account ID
         String fileName = "data/log/" + id + ".txt";
         Path filePath = Paths.get(fileName);
@@ -245,11 +245,11 @@ public class UserService {
         }
     }
 
-    //Main method for testing
-    public static void main(String[] args) throws IOException {
-        depositMoney(1, "CZK", 100);
-        System.out.println(readLog(1));
-    }
+    // Main method for testing
+    //public static void main(String[] args) throws IOException {
+        //depositMoney(1, "CZK", 100);
+        //System.out.println(readLog(1));
+    //}
 }
 
 

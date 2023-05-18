@@ -121,13 +121,13 @@ public class ConfirmationTokenService {
     }
 
     // Main method for testing
-    public static void main(String[] args) {
-        ConfirmationTokenRepository confirmationTokenRepository = new ConfirmationTokenRepository();
-        ConfirmationTokenService confirmationTokenService = new ConfirmationTokenService(confirmationTokenRepository);
+    //public static void main(String[] args) {
+        //ConfirmationTokenRepository confirmationTokenRepository = new ConfirmationTokenRepository();
+        //ConfirmationTokenService confirmationTokenService = new ConfirmationTokenService(confirmationTokenRepository);
 
-        boolean isConfirmed = confirmationTokenService.isTokenConfirmed("220f96a6-a280-4bbb-97c8-da8e94844144");
+        //boolean isConfirmed = confirmationTokenService.isTokenConfirmed("220f96a6-a280-4bbb-97c8-da8e94844144");
 
-        System.out.println("Token is confirmed: " + isConfirmed);
-    }
+        //System.out.println("Token is confirmed: " + isConfirmed);
+    //}
 
 }

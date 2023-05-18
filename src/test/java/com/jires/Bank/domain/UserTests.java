@@ -83,4 +83,46 @@ public class UserTests {
 
         file.delete();
     }
+
+    @Test
+    public void testSetId_SetsId() {
+        User user = new User(1, "John", "Doe", "john.doe@example.com", "password123");
+        user.setId(2);
+        Assertions.assertEquals(2, user.getId());
+    }
+
+    @Test
+    public void testSetFirstName_SetsFirstName() {
+        User user = new User(1, "John", "Doe", "john.doe@example.com", "password123");
+        user.setFirstName("Jane");
+        Assertions.assertEquals("Jane", user.getFirstName());
+    }
+
+    @Test
+    public void testSetLastName_SetsLastName() {
+        User user = new User(1, "John", "Doe", "john.doe@example.com", "password123");
+
+        user.setLastName("Smith");
+
+        Assertions.assertEquals("Smith", user.getLastName());
+    }
+
+    @Test
+    public void testSetEmail_SetsEmail() {
+        User user = new User(1, "John", "Doe", "john.doe@example.com", "password123");
+
+        user.setEmail("jane.smith@example.com");
+
+        Assertions.assertEquals("jane.smith@example.com", user.getEmail());
+    }
+
+    @Test
+    public void testSetPassword_SetsPassword() {
+        User user = new User(1, "John", "Doe", "john.doe@example.com", "password123");
+
+        user.setPassword("newPassword123");
+
+        Assertions.assertEquals("newPassword123", user.getPassword());
+    }
+
 }

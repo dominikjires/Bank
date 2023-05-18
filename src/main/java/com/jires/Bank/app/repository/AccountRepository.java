@@ -27,9 +27,9 @@ public class AccountRepository {
     }
 
     // Main method for testing
-    public static void main(String[] args) {
-        List<Account> accounts = new ArrayList<>();
-        accounts = findAccountsByUserId(1);
-        System.out.println(accounts);
-    }
+    //public static void main(String[] args) {
+    //    List<Account> accounts = new ArrayList<>();
+    //    accounts = findAccountsByUserId(1);
+    //    System.out.println(accounts);
+    //}
 }

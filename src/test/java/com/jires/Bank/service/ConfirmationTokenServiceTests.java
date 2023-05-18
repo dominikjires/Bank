@@ -11,6 +11,7 @@ import org.mockito.MockitoAnnotations;
 import java.io.*;
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -62,5 +63,55 @@ public class ConfirmationTokenServiceTests {
         assertFalse(isConfirmed);
         verify(confirmationTokenRepository, times(1)).getToken(tokenString);
     }
+
+    @Test
+    public void testSetConfirmedAt_ValidDateRange() throws IOException {
+        String tokenToConfirm = "token123kdnfsfnsdf";
+        String existingTokenData = "1," + tokenToConfirm + ",2023-05-17T10:30:00,2023-05-20T10:30:00,false,1";
+        appendDataToFile(existingTokenData);
+
+        int rowsAffected = confirmationTokenService.setConfirmedAt(tokenToConfirm);
+        boolean isTokenConfirmed = confirmationTokenService.isTokenConfirmed(tokenToConfirm);
+        assertFalse(isTokenConfirmed);
+    }
+
+    // Existing token with expired date range, should not be confirmed
+    @Test
+    public void testSetConfirmedAt_ExpiredDateRange() throws IOException {
+        String tokenToConfirm = "token123";
+        String existingTokenData = "1," + tokenToConfirm + ",2021-05-17T10:30:00,2021-05-20T10:30:00,false,1";
+        appendDataToFile(existingTokenData);
+
+        int rowsAffected = confirmationTokenService.setConfirmedAt(tokenToConfirm);
+        boolean isTokenConfirmed = confirmationTokenService.isTokenConfirmed(tokenToConfirm);
+        assertFalse(isTokenConfirmed);
+    }
+
+    // Non-existing token, no rows affected
+    @Test
+    public void testSetConfirmedAt_NonExistingToken() throws IOException {
+        String tokenToConfirm = "nonexistent_token";
+        int rowsAffected = confirmationTokenService.setConfirmedAt(tokenToConfirm);
+        assertEquals(0, rowsAffected);
+        boolean isTokenConfirmed = confirmationTokenService.isTokenConfirmed(tokenToConfirm);
+        assertFalse(isTokenConfirmed);
+    }
+
+    private void appendDataToFile(String data) throws IOException {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("data/tokens.txt", true))) {
+            writer.write(data);
+            writer.newLine();
+        }
+    }
+
+    @Test
+    void setConfirmedAt_InvalidToken_ReturnsZeroRowsAffected() {
+        String tokenString = UUID.randomUUID().toString();
+        when(confirmationTokenRepository.getToken(tokenString)).thenReturn(Optional.empty());
+        int rowsAffected = confirmationTokenService.setConfirmedAt(tokenString);
+        assertEquals(0, rowsAffected);
+    }
+
+
 
 }
