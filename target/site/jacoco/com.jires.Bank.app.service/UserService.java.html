@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="cs"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UserService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Bank</a> &gt; <a href="index.source.html" class="el_package">com.jires.Bank.app.service</a> &gt; <span class="el_source">UserService.java</span></div><h1>UserService.java</h1><pre class="source lang-java linenums">package com.jires.Bank.app.service;
+
+import org.springframework.stereotype.Service;
+
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import static com.jires.Bank.app.service.ExchangeRateService.calculateExchange;
+import static java.lang.Math.abs;
+
+@Service
+<span class="fc" id="L21">public class UserService {</span>
+
+    // Function to check if the account exists in the system
+    public static boolean accountExists(long id, String type) {
+<span class="fc" id="L25">        String filePath = String.format(&quot;data/%d.txt&quot;, id);</span>
+<span class="fc" id="L26">        File file = new File(filePath);</span>
+<span class="fc bfc" id="L27" title="All 2 branches covered.">        if (!file.exists()) {</span>
+<span class="fc" id="L28">            throw new IllegalArgumentException(&quot;Account file not found&quot;);</span>
+        }
+<span class="fc" id="L30">        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {</span>
+            String line;
+<span class="fc bfc" id="L32" title="All 2 branches covered.">            while ((line = reader.readLine()) != null) {</span>
+<span class="fc" id="L33">                String[] parts = line.split(&quot;,&quot;);</span>
+<span class="pc bpc" id="L34" title="1 of 2 branches missed.">                if (parts.length != 2) {</span>
+<span class="nc" id="L35">                    throw new IllegalArgumentException(&quot;Invalid account file format&quot;);</span>
+                }
+<span class="fc bfc" id="L37" title="All 2 branches covered.">                if (parts[0].equals(type)) {</span>
+<span class="fc" id="L38">                    return true;</span>
+                }
+<span class="fc" id="L40">            }</span>
+<span class="fc" id="L41">            return false;</span>
+<span class="pc" id="L42">        } catch (IOException e) {</span>
+<span class="nc" id="L43">            throw new RuntimeException(&quot;Error loading accounts from file&quot;, e);</span>
+        }
+    }
+
+    // Function to add an account to the system
+    public static void addAccount(long id, String type, double amount) {
+<span class="fc" id="L49">        String filePath = String.format(&quot;data/%d.txt&quot;, id);</span>
+<span class="fc" id="L50">        File file = new File(filePath);</span>
+<span class="fc bfc" id="L51" title="All 2 branches covered.">        if (!file.exists()) {</span>
+<span class="fc" id="L52">            throw new IllegalArgumentException(&quot;Account file not found&quot;);</span>
+        }
+<span class="fc" id="L54">        try (BufferedReader reader = new BufferedReader(new FileReader(file));</span>
+<span class="fc" id="L55">             BufferedWriter writer = new BufferedWriter(new FileWriter(file, true))) {</span>
+            String line;
+<span class="fc" id="L57">            boolean accountExists = false;</span>
+<span class="pc bpc" id="L58" title="1 of 2 branches missed.">            while ((line = reader.readLine()) != null) {</span>
+<span class="fc" id="L59">                String[] parts = line.split(&quot;,&quot;);</span>
+<span class="pc bpc" id="L60" title="1 of 2 branches missed.">                if (parts.length != 2) {</span>
+<span class="nc" id="L61">                    throw new IllegalArgumentException(&quot;Invalid account file format&quot;);</span>
+                }
+<span class="fc bfc" id="L63" title="All 2 branches covered.">                if (parts[0].equals(type)) {</span>
+<span class="fc" id="L64">                    accountExists = true;</span>
+<span class="fc" id="L65">                    break;</span>
+                }
+<span class="fc" id="L67">            }</span>
+<span class="pc bpc" id="L68" title="1 of 2 branches missed.">            if (!accountExists) {</span>
+<span class="nc" id="L69">                writer.write(type + &quot;,&quot; + amount + &quot;\n&quot;);</span>
+            } else {
+<span class="fc" id="L71">                throw new IllegalArgumentException(&quot;Account of type already exists&quot;);</span>
+            }
+<span class="nc" id="L73">        } catch (IOException e) {</span>
+<span class="nc" id="L74">            throw new RuntimeException(&quot;Error loading accounts from file&quot;, e);</span>
+<span class="nc" id="L75">        }</span>
+<span class="nc" id="L76">    }</span>
+
+    // Function to deposit money into an account
+    public static boolean depositMoney(long id, String type, double amount) throws IOException {
+<span class="fc" id="L80">        Path inputPath = Paths.get(&quot;data&quot;, id + &quot;.txt&quot;);</span>
+<span class="fc" id="L81">        Path tempPath = Paths.get(&quot;data&quot;, id + &quot;_temp.txt&quot;);</span>
+
+<span class="fc" id="L83">        try (BufferedReader reader = Files.newBufferedReader(inputPath);</span>
+<span class="fc" id="L84">             BufferedWriter writer = Files.newBufferedWriter(tempPath)) {</span>
+            String line;
+<span class="fc bfc" id="L86" title="All 2 branches covered.">            while ((line = reader.readLine()) != null) {</span>
+<span class="fc" id="L87">                String[] parts = line.split(&quot;,&quot;);</span>
+<span class="fc bfc" id="L88" title="All 2 branches covered.">                if (parts[0].equals(type)) {</span>
+<span class="fc bfc" id="L89" title="All 2 branches covered.">                    if((Double.parseDouble(parts[1].trim()) + amount) &gt; Double.MAX_VALUE){</span>
+<span class="fc" id="L90">                        return false;</span>
+                    }
+<span class="fc" id="L92">                    double newAmount = Double.parseDouble(parts[1].trim()) + amount;</span>
+<span class="fc" id="L93">                    line = type + &quot;,&quot; + newAmount;</span>
+<span class="fc" id="L94">                    writeToLog(id,&quot;+&quot;,type,amount);</span>
+                }
+<span class="fc" id="L96">                writer.write(line + System.lineSeparator());</span>
+<span class="fc" id="L97">            }</span>
+<span class="pc bpc" id="L98" title="2 of 4 branches missed.">        } catch (IOException e) {</span>
+<span class="fc" id="L99">            System.err.println(&quot;Error updating account: &quot; + e.getMessage());</span>
+<span class="fc" id="L100">            return false;</span>
+<span class="fc" id="L101">        }</span>
+        try {
+<span class="fc" id="L103">            Files.move(tempPath, inputPath, StandardCopyOption.REPLACE_EXISTING);</span>
+<span class="nc" id="L104">        } catch (IOException e) {</span>
+<span class="nc" id="L105">            System.err.println(&quot;Error renaming file: &quot; + e.getMessage());</span>
+<span class="nc" id="L106">            return false;</span>
+<span class="fc" id="L107">        }</span>
+
+<span class="fc" id="L109">        return true;</span>
+    }
+
+    // Function to pay money from an account
+    public static int payment(long id, String type, double amount) throws IOException {
+        // Define input and temporary files
+<span class="fc" id="L115">        File inputFile = new File(&quot;data/&quot; + id + &quot;.txt&quot;);</span>
+<span class="fc" id="L116">        File tempFile = new File(&quot;data/&quot; + id + &quot;_temp.txt&quot;);</span>
+<span class="fc" id="L117">        String found = null;</span>
+<span class="fc" id="L118">        double newAmount = 0;</span>
+
+        // Read input file and write to temporary file
+<span class="fc" id="L121">        try (BufferedReader reader = new BufferedReader(new FileReader(inputFile));</span>
+<span class="fc" id="L122">             BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile))) {</span>
+            String line;
+<span class="fc" id="L124">            boolean foundType = false;</span>
+<span class="fc bfc" id="L125" title="All 2 branches covered.">            while ((line = reader.readLine()) != null) {</span>
+                // Search for the specified type in the input file
+<span class="fc bfc" id="L127" title="All 2 branches covered.">                if (line.contains(type)) {</span>
+                    // If the specified type is found and funds are available for payment, update the balance amount
+<span class="fc" id="L129">                    String[] parts = line.split(&quot;,&quot;);</span>
+<span class="fc bfc" id="L130" title="All 2 branches covered.">                    if (Double.parseDouble(parts[1].trim()) - amount &gt; 0) {</span>
+<span class="fc" id="L131">                        newAmount = Double.parseDouble(parts[1].trim()) - amount;</span>
+<span class="fc" id="L132">                        foundType = true;</span>
+<span class="fc" id="L133">                        found = type;</span>
+                        // Write the transaction to the log file
+<span class="fc" id="L135">                        writeToLog(id,&quot;-&quot;,found,amount);</span>
+<span class="pc bpc" id="L136" title="1 of 2 branches missed.">                    } else if (amount &lt; (Double.parseDouble(parts[1].trim())+Double.parseDouble(parts[1].trim()) * 0.1 )){</span>
+                        // Make an overdraft if the payment does not exceed 10% of the balance
+<span class="nc" id="L138">                        newAmount = Double.parseDouble(parts[1].trim()) - (amount + 0.1 * amount);</span>
+<span class="nc" id="L139">                        foundType = true;</span>
+<span class="nc" id="L140">                        found = type;</span>
+                        // Write the transaction to the log file
+<span class="nc" id="L142">                        writeToLog(id,&quot;-&quot;,found,amount + 0.1 * amount);</span>
+                    } else {
+                        break;
+                    }
+<span class="fc" id="L146">                }</span>
+            }
+<span class="fc" id="L148">            reader.close();</span>
+            // If the specified type is not found, search for CZK in the input file
+<span class="fc bfc" id="L150" title="All 2 branches covered.">            if (!foundType) {</span>
+<span class="fc" id="L151">                BufferedReader reader2 = new BufferedReader(new FileReader(inputFile));</span>
+<span class="fc bfc" id="L152" title="All 2 branches covered.">                while ((line = reader2.readLine()) != null) {</span>
+<span class="fc bfc" id="L153" title="All 2 branches covered.">                    if (line.contains(&quot;CZK&quot;)) {</span>
+<span class="fc" id="L154">                        String[] parts = line.split(&quot;,&quot;);</span>
+<span class="fc" id="L155">                        double convertedAmount = calculateExchange(type, amount);</span>
+<span class="fc bfc" id="L156" title="All 2 branches covered.">                        if (Double.parseDouble(parts[1].trim()) - convertedAmount &lt; 0) {</span>
+<span class="fc" id="L157">                            reader2.close();</span>
+<span class="fc" id="L158">                            return 0;</span>
+                        } else {
+<span class="fc" id="L160">                            newAmount = Double.parseDouble(parts[1].trim()) - convertedAmount;</span>
+<span class="fc" id="L161">                            foundType = true;</span>
+<span class="fc" id="L162">                            found = &quot;CZK&quot;;</span>
+                            // Write the transaction to the log file
+<span class="fc" id="L164">                            writeToLog(id,&quot;-&quot;,found,convertedAmount);</span>
+                        }
+<span class="fc" id="L166">                    }</span>
+                }
+<span class="fc" id="L168">                reader2.close();</span>
+            }
+            // If the specified type or CZK is found, update the balance amount in the input file
+<span class="pc bpc" id="L171" title="1 of 2 branches missed.">            if (foundType) {</span>
+<span class="fc" id="L172">                BufferedReader reader3 = new BufferedReader(new FileReader(inputFile));</span>
+<span class="fc bfc" id="L173" title="All 2 branches covered.">                while ((line = reader3.readLine()) != null) {</span>
+<span class="fc bfc" id="L174" title="All 2 branches covered.">                    if (line.contains(found)) {</span>
+<span class="fc" id="L175">                        line = found + &quot;,&quot; + newAmount;</span>
+                    }
+<span class="fc" id="L177">                    writer.write(line + System.lineSeparator());</span>
+                }
+<span class="fc" id="L179">                reader3.close();</span>
+            }
+<span class="pc" id="L181">        } catch (IOException e) {</span>
+<span class="nc" id="L182">            e.printStackTrace();</span>
+<span class="nc" id="L183">            return 0;</span>
+<span class="fc" id="L184">        }</span>
+        // Replace the input file with the temporary file
+<span class="pc bpc" id="L186" title="1 of 2 branches missed.">        if (inputFile.delete()) {</span>
+<span class="pc bpc" id="L187" title="1 of 2 branches missed.">            if (!tempFile.renameTo(inputFile)) {</span>
+<span class="nc" id="L188">                System.err.println(&quot;Error renaming file&quot;);</span>
+<span class="nc" id="L189">                return 0;</span>
+            }
+        } else {
+<span class="nc" id="L192">            System.err.println(&quot;Error deleting file&quot;);</span>
+<span class="nc" id="L193">            return 0;</span>
+        }
+<span class="fc" id="L195">        return 1;</span>
+    }
+
+    // Write a log entry for a transaction
+    public static void writeToLog(long id, String type, String currency, double amount) {
+        // Construct the filename for the log file based on the account ID
+<span class="fc" id="L201">        String fileName = &quot;data/log/&quot; + id + &quot;.txt&quot;;</span>
+<span class="fc" id="L202">        Path filePath = Paths.get(fileName);</span>
+
+        try {
+            // Create the directory and file if they don't already exist
+<span class="pc bpc" id="L206" title="1 of 2 branches missed.">            if (!Files.exists(filePath)) {</span>
+<span class="nc" id="L207">                Files.createDirectories(filePath.getParent());</span>
+<span class="nc" id="L208">                Files.createFile(filePath);</span>
+            }
+
+            // Read all existing lines from the log file into a list
+<span class="fc" id="L212">            List&lt;String&gt; lines = new ArrayList&lt;&gt;(Files.readAllLines(filePath, StandardCharsets.UTF_8));</span>
+
+            // If the log file has more than 5 lines, remove the oldest line
+<span class="pc bpc" id="L215" title="1 of 2 branches missed.">            if (lines.size() &gt;= 5) {</span>
+<span class="fc" id="L216">                lines.remove(0);</span>
+            }
+
+            // Get the current date and time
+<span class="fc" id="L220">            LocalDateTime now = LocalDateTime.now();</span>
+            // Format the date and time as a string
+<span class="fc" id="L222">            String formattedDateTime = now.format(DateTimeFormatter.ofPattern(&quot;yyyy-MM-dd HH:mm&quot;));</span>
+
+            // Add a new log entry to the list of lines
+<span class="fc" id="L225">            lines.add(formattedDateTime + &quot; &quot; + type + &quot; &quot; + currency + &quot; &quot; + amount);</span>
+
+            // Write the updated list of lines back to the log file
+<span class="fc" id="L228">            Files.write(filePath, lines, StandardCharsets.UTF_8);</span>
+<span class="nc" id="L229">        } catch (IOException e) {</span>
+<span class="nc" id="L230">            e.printStackTrace();</span>
+<span class="fc" id="L231">        }</span>
+<span class="fc" id="L232">    }</span>
+
+    // Read the log file for a given account ID
+    public static List&lt;String&gt; readLog(long id) {
+        // Construct the filename for the log file based on the account ID
+<span class="fc" id="L237">        String fileName = &quot;data/log/&quot; + id + &quot;.txt&quot;;</span>
+<span class="fc" id="L238">        Path filePath = Paths.get(fileName);</span>
+
+        try {
+            // If the log file doesn't exist, return an empty list
+<span class="fc bfc" id="L242" title="All 2 branches covered.">            if (!Files.exists(filePath)) {</span>
+<span class="fc" id="L243">                return Collections.emptyList();</span>
+            }
+            // Read all lines from the log file into a list
+<span class="fc" id="L246">            List&lt;String&gt; lines = Files.readAllLines(filePath, StandardCharsets.UTF_8);</span>
+            // Reverse the order of the lines so the most recent entries are first
+<span class="fc" id="L248">            Collections.reverse(lines);</span>
+<span class="fc" id="L249">            return lines;</span>
+<span class="nc" id="L250">        } catch (IOException e) {</span>
+<span class="nc" id="L251">            e.printStackTrace();</span>
+<span class="nc" id="L252">            return Collections.emptyList();</span>
+        }
+    }
+
+    // Main method for testing
+    //public static void main(String[] args) throws IOException {
+        //depositMoney(1, &quot;CZK&quot;, 100);
+        //System.out.println(readLog(1));
+    //}
+}
+
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

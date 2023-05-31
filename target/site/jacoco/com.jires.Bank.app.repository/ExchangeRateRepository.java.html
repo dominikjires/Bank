@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="cs"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ExchangeRateRepository.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Bank</a> &gt; <a href="index.source.html" class="el_package">com.jires.Bank.app.repository</a> &gt; <span class="el_source">ExchangeRateRepository.java</span></div><h1>ExchangeRateRepository.java</h1><pre class="source lang-java linenums">package com.jires.Bank.app.repository;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.jires.Bank.app.domain.ExchangeRate;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.core5.http.ParseException;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.springframework.stereotype.Repository;
+
+@Repository
+<span class="fc" id="L19">public class ExchangeRateRepository {</span>
+
+    // Method to retrieve exchange rates from file
+    public static List&lt;ExchangeRate&gt; getExchangeRates() throws IOException {
+<span class="fc" id="L23">        List&lt;ExchangeRate&gt; exchangeRates = new ArrayList&lt;&gt;();</span>
+
+        // Read exchange rate data from file
+<span class="fc" id="L26">        String[][] exchangeRateArray = readExchangeFile();</span>
+
+        // Create ExchangeRate object for each line and add to the list
+<span class="fc bfc" id="L29" title="All 2 branches covered.">        for (String[] exchangeRate : exchangeRateArray) {</span>
+<span class="fc" id="L30">            ExchangeRate exRate = new ExchangeRate(</span>
+                    exchangeRate[0],
+                    exchangeRate[1],
+                    exchangeRate[2],
+                    exchangeRate[3],
+                    exchangeRate[4]
+            );
+<span class="fc" id="L37">            exchangeRates.add(exRate);</span>
+        }
+<span class="fc" id="L39">        return exchangeRates;</span>
+    }
+
+    // Method to get HTML content from a URL using HTTP GET request
+    public static String getHtmlContent(String url) {
+<span class="fc" id="L44">        CloseableHttpClient httpClient = HttpClients.createDefault();</span>
+<span class="fc" id="L45">        HttpGet request = new HttpGet(url);</span>
+
+<span class="fc" id="L47">        try (CloseableHttpResponse response = httpClient.execute(request)) {</span>
+<span class="fc" id="L48">            return EntityUtils.toString(response.getEntity());</span>
+<span class="fc" id="L49">        } catch (IOException ignored) {</span>
+
+<span class="nc" id="L51">        } catch (ParseException e) {</span>
+<span class="nc" id="L52">            throw new RuntimeException(e);</span>
+<span class="fc" id="L53">        }</span>
+<span class="fc" id="L54">        return null;</span>
+    }
+
+    // Method to print a 2D string array
+    public static void printArray(String[][] text) {
+<span class="fc bfc" id="L59" title="All 2 branches covered.">        for (int i = 0; i &lt; text.length; i++) {</span>
+<span class="fc bfc" id="L60" title="All 2 branches covered.">            for (int j = 0; j &lt; text[i].length; j++) {</span>
+<span class="fc" id="L61">                System.out.print(text[i][j] + &quot; &quot;);</span>
+            }
+<span class="fc" id="L63">            System.out.println();</span>
+        }
+<span class="fc" id="L65">    }</span>
+
+    // Method to retrieve exchange rate data for a specific currency
+    public static String[] getExchangeRate(String currency) throws IOException {
+<span class="fc" id="L69">        String[][] read = readExchangeFile();</span>
+<span class="fc bfc" id="L70" title="All 2 branches covered.">        for (int i = 0; i &lt; read.length; i++) {</span>
+<span class="fc bfc" id="L71" title="All 2 branches covered.">            if (read[i][3].equalsIgnoreCase(currency)) {</span>
+<span class="fc" id="L72">                return read[i];</span>
+            }
+        }
+<span class="fc" id="L75">        return null;</span>
+    }
+
+    // Method to read exchange rate data from file and return as 2D string array
+    public static String[][] readExchangeFile() throws IOException {
+<span class="fc" id="L80">        List&lt;String&gt; edit = Files.readAllLines(Paths.get(&quot;src/main/resources/ExchangeRate.txt&quot;));</span>
+<span class="fc" id="L81">        List&lt;String[]&gt; outputList = new ArrayList&lt;&gt;();</span>
+
+        // Iterate over lines of data and split into array of fields
+<span class="fc bfc" id="L84" title="All 2 branches covered.">        for (int i = 3; i &lt; 34; i++) {</span>
+<span class="fc" id="L85">            String[] line = edit.get(i).split(&quot;\\|&quot;);</span>
+<span class="fc" id="L86">            outputList.add(line);</span>
+        }
+
+        // Convert list of string arrays to 2D string array
+<span class="fc" id="L90">        String[][] output = new String[outputList.size()][];</span>
+<span class="fc bfc" id="L91" title="All 2 branches covered.">        for (int i = 0; i &lt; outputList.size(); i++) {</span>
+<span class="fc" id="L92">            output[i] = outputList.get(i);</span>
+        }
+
+<span class="fc" id="L95">        return output;</span>
+    }
+
+    // Main method gor testing
+    //public static void main(String[] args) throws IOException {
+    // Example usage: print exchange rate data to console
+    //    List&lt;ExchangeRate&gt; exchangeRates = getExchangeRates();
+    //    for (ExchangeRate exchangeRate : exchangeRates) {
+    //        System.out.println(exchangeRate.getExchangeRate() + exchangeRate.getCode());
+    //    }
+    //}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

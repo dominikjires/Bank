@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="cs"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UserRepository.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Bank</a> &gt; <a href="index.source.html" class="el_package">com.jires.Bank.app.repository</a> &gt; <span class="el_source">UserRepository.java</span></div><h1>UserRepository.java</h1><pre class="source lang-java linenums">package com.jires.Bank.app.repository;
+
+import com.jires.Bank.app.domain.User;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Objects;
+
+<span class="nc" id="L9">public class UserRepository {</span>
+
+    // Finds a user with the given ID and returns it, or null if not found.
+    public static User findUser(long id) {
+<span class="fc" id="L13">        try (BufferedReader reader = new BufferedReader(new FileReader(&quot;data/users.txt&quot;))) {</span>
+            String line;
+<span class="fc bfc" id="L15" title="All 2 branches covered.">            while ((line = reader.readLine()) != null) {</span>
+<span class="fc" id="L16">                String[] parts = line.split(&quot;,&quot;);</span>
+<span class="fc bfc" id="L17" title="All 2 branches covered.">                if (id == Long.parseLong(parts[0])) {</span>
+<span class="fc" id="L18">                    User user = new User(Long.parseLong(parts[0]), parts[1], parts[2], parts[3], parts[4]);</span>
+<span class="fc" id="L19">                    return user;</span>
+                }
+<span class="fc" id="L21">            }</span>
+<span class="pc" id="L22">        } catch (IOException e) {</span>
+<span class="nc" id="L23">            System.err.println(&quot;Error loading user from file: &quot; + e.getMessage());</span>
+<span class="fc" id="L24">        }</span>
+<span class="fc" id="L25">        return null;</span>
+    }
+
+    // Finds the ID of a user with the given email and returns it, or 0 if not found.
+    public static long getId(String email) {
+<span class="fc" id="L30">        try (BufferedReader reader = new BufferedReader(new FileReader(&quot;data/users.txt&quot;))) {</span>
+            String line;
+<span class="fc bfc" id="L32" title="All 2 branches covered.">            while ((line = reader.readLine()) != null) {</span>
+<span class="fc" id="L33">                String[] parts = line.split(&quot;,&quot;);</span>
+<span class="fc bfc" id="L34" title="All 2 branches covered.">                if (Objects.equals(email, parts[3])) {</span>
+<span class="fc" id="L35">                    return Long.parseLong(parts[0]);</span>
+                }
+<span class="fc" id="L37">            }</span>
+<span class="pc" id="L38">        } catch (IOException e) {</span>
+<span class="nc" id="L39">            System.err.println(&quot;Error loading user from file: &quot; + e.getMessage());</span>
+<span class="fc" id="L40">        }</span>
+<span class="fc" id="L41">        return 0;</span>
+    }
+
+    // Finds a user with the given email and returns it, or null if not found.
+    public static User findUserEmail(String email) {
+<span class="fc" id="L46">        try (BufferedReader reader = new BufferedReader(new FileReader(&quot;data/users.txt&quot;))) {</span>
+            String line;
+<span class="fc bfc" id="L48" title="All 2 branches covered.">            while ((line = reader.readLine()) != null) {</span>
+<span class="fc" id="L49">                String[] parts = line.split(&quot;,&quot;);</span>
+<span class="fc bfc" id="L50" title="All 2 branches covered.">                if (Objects.equals(email, parts[3])) {</span>
+<span class="fc" id="L51">                    User user = new User(Long.parseLong(parts[0]), parts[1], parts[2], parts[3], parts[4]);</span>
+<span class="fc" id="L52">                    return user;</span>
+                }
+<span class="fc" id="L54">            }</span>
+<span class="pc" id="L55">        } catch (IOException e) {</span>
+<span class="nc" id="L56">            System.err.println(&quot;Error loading user from file: &quot; + e.getMessage());</span>
+<span class="fc" id="L57">        }</span>
+<span class="fc" id="L58">        return null;</span>
+    }
+
+    // Main method gor testing
+    //public static void main(String[] args) {
+    //    // This main method is used for testing. It finds the ID of a user with the email &quot;jane.doe@example.com&quot; and prints it to the console.
+    //    System.out.println(getId(&quot;jane.doe@example.com&quot;));
+    //}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

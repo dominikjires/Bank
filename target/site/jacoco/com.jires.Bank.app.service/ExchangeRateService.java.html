@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="cs"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ExchangeRateService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Bank</a> &gt; <a href="index.source.html" class="el_package">com.jires.Bank.app.service</a> &gt; <span class="el_source">ExchangeRateService.java</span></div><h1>ExchangeRateService.java</h1><pre class="source lang-java linenums">package com.jires.Bank.app.service;
+
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import static com.jires.Bank.app.repository.ExchangeRateRepository.getHtmlContent;
+import static com.jires.Bank.app.repository.ExchangeRateRepository.getExchangeRate;
+
+@Service
+@EnableScheduling
+<span class="fc" id="L17">public class ExchangeRateService {</span>
+
+<span class="fc" id="L19">    private final String FILENAME = &quot;exchangeRate.txt&quot;;</span>
+<span class="fc" id="L20">    private final String FILEPATH = &quot;src/main/resources/&quot;;</span>
+<span class="fc" id="L21">    private final String URL = &quot;https://www.cnb.cz/cs/financni-trhy/devizovy-trh/kurzy-devizoveho-trhu/kurzy-devizoveho-trhu/denni_kurz.txt&quot;;</span>
+
+    // This method refreshes the exchange rate file on weekdays at 3 PM
+    @Scheduled(cron = &quot;0 00 16 ? * MON-FRI&quot;, zone = &quot;Europe/Prague&quot;)
+    public void refreshExchangeFile() throws IOException {
+        // Get the HTML content of the exchange rate website
+<span class="nc" id="L27">        String htmlContent = getHtmlContent(URL);</span>
+
+        try {
+            // Get the current timestamp
+<span class="nc" id="L31">            LocalDateTime now = LocalDateTime.now();</span>
+<span class="nc" id="L32">            DateTimeFormatter formatter = DateTimeFormatter.ofPattern(&quot;yyyy-MM-dd HH:mm:ss&quot;);</span>
+<span class="nc" id="L33">            String timestamp = now.format(formatter);</span>
+
+            // Write the HTML content and the timestamp to the exchange rate file
+<span class="nc" id="L36">            Path filePath = Paths.get(FILEPATH + FILENAME);</span>
+<span class="nc" id="L37">            FileWriter writer = new FileWriter(filePath.toFile(), false); // false for override whole file as new one</span>
+<span class="nc" id="L38">            writer.write(timestamp + &quot;\n&quot;);</span>
+<span class="nc" id="L39">            writer.write(htmlContent + &quot;\n&quot;);</span>
+<span class="nc" id="L40">            writer.close();</span>
+<span class="nc" id="L41">        } catch (IOException e) {</span>
+<span class="nc" id="L42">            System.err.println(&quot;Error while writing exchange rate file: &quot; + e.getMessage());</span>
+<span class="nc" id="L43">        }</span>
+<span class="nc" id="L44">    }</span>
+
+    // This method calculates the exchange rate between a given currency and CZK
+    public static double calculateExchange(String currencyFrom, double amount) throws IOException {
+<span class="fc bfc" id="L48" title="All 2 branches covered.">        if (currencyFrom.equalsIgnoreCase(&quot;CZK&quot;)) {</span>
+<span class="fc" id="L49">            return amount;</span>
+        }
+
+        // Get the exchange rate information for the given currency
+<span class="fc" id="L53">        String[] exchangeInfo = getExchangeRate(currencyFrom);</span>
+<span class="fc" id="L54">        double exAmount = Double.parseDouble(exchangeInfo[2].replaceAll(&quot;,&quot;, &quot;.&quot;)); // amount to CZK</span>
+<span class="fc" id="L55">        double exRate = Double.parseDouble(exchangeInfo[4].replaceAll(&quot;,&quot;, &quot;.&quot;)); // exchange rate</span>
+
+        // Calculate the exchange rate
+<span class="fc" id="L58">        return (amount * exRate) / exAmount;</span>
+    }
+
+    // This is a testing method to check the calculateExchange() method
+    //public static void main(String[] args) throws IOException {
+        //System.out.println(calculateExchange(&quot;USD&quot;, 1000));
+    //}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>
