@@ -52,7 +52,7 @@ public class CustomUserDetailsServiceImpl implements UserDetailsService {
 
         // Send an email to the user containing a link to confirm their account
         String address = user.getEmail();
-        String content = "Prosím potvrďte přihlášení ná váš účet kliknutím na link níže / Please click the link below to verify your account: \n\n" + "<a href='https://bank-application-production.herokuapp.com/confirm?token=" + token + "'>https://bank-application.herokuapp.com/confirm?token=" + token + "</a>";
+        String content = "Prosím potvrďte přihlášení ná váš účet kliknutím na link níže / Please click the link below to verify your account: \n\n" + "<a href='https://bank-application-production.herokuapp.com/confirm?token=" + token + "'>https://bank-application-production.herokuapp.com/confirm?token=" + token + "</a>";
         emailSender.send(address,content);
         System.out.println("localhost:8080/confirm?token=" + token);
 
