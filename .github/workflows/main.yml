@@ -1,0 +1,30 @@
+name: Run Maven Tests and Push Files
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  run-tests-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+
+      - name: Run Maven Tests
+        run: mvn test
+
+      - name: Commit and Push Files
+        run: |
+          git config --local user.name "dominikjires"
+          git config --local user.email "dominik.jires@tul.cz"
+          git add .
+          git commit -m "Add test results"
+          git push
