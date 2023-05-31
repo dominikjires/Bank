@@ -6,9 +6,11 @@ import com.jires.Bank.app.domain.User;
 import com.jires.Bank.app.repository.UserRepository;
 import com.jires.Bank.app.service.ConfirmationTokenService;
 import com.jires.Bank.app.service.CustomUserDetailsServiceImpl;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -222,6 +224,19 @@ public class CustomUserDetailsServiceTestsImpl {
         when(confirmationTokenService.getToken(token)).thenReturn(Optional.of(confirmationToken));
 
     }
+
+    @Test
+    public void testLoadUserByUsername_InvalidUsername() {
+        EmailSender emailSender = Mockito.mock(EmailSender.class);
+        ConfirmationTokenService confirmationTokenService = Mockito.mock(ConfirmationTokenService.class);
+
+        CustomUserDetailsServiceImpl userDetailsService = new CustomUserDetailsServiceImpl(emailSender, confirmationTokenService);
+
+        // Try to load user with an invalid username
+        Assertions.assertThrows(UsernameNotFoundException.class, () -> userDetailsService.loadUserByUsername("invalid@example.com"));
+    }
+
+
 
 
 
