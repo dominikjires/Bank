@@ -55,7 +55,7 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: jacoco-report
-        path: target
+        path: target/site/jacoco
         
     - name: Get the Coverage info
       run: |
