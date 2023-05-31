@@ -1,7 +1,7 @@
 name: Run Maven Tests and Push Files
 
 on:
-  push:
+  pull_request:
     branches:
       - main
 
