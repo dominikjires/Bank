@@ -1,0 +1,21 @@
+{
+  "name": "Bank",
+  "description": "Bank application",
+  "repository": "https://github.com/dominikjires/Bank",
+  "keywords": ["spring", "java", "heroku"],
+  "formation": {
+    "web": {
+      "quantity": 1,
+      "size": "Free"
+    }
+  },
+  "scripts": {
+    "postdeploy": "mvn test"
+  },
+  "buildpacks": [
+    {
+      "url": "heroku/java"
+    }
+  ],
+  "stack": "heroku-20"
+}
