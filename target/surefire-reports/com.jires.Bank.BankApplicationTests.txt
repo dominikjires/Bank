@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: com.jires.Bank.BankApplicationTests
 -------------------------------------------------------------------------------
-Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 5.333 s - in com.jires.Bank.BankApplicationTests
+Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.959 s - in com.jires.Bank.BankApplicationTests
