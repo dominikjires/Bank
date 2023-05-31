@@ -73,7 +73,7 @@ public class ConfirmationTokenService {
 <span class="fc bfc" id="L73" title="All 2 branches covered.">            while ((line = reader1.readLine()) != null) {</span>
 <span class="fc" id="L74">                String[] tokenData = line.split(&quot;,&quot;);</span>
 <span class="fc bfc" id="L75" title="All 2 branches covered.">                if (tokenData[0].equals(token)) {</span>
-<span class="pc bpc" id="L76" title="1 of 4 branches missed.">                    if (LocalDateTime.now().isAfter(LocalDateTime.parse(tokenData[1])) &amp;&amp; LocalDateTime.now().isBefore(LocalDateTime.parse(tokenData[2]))) {</span>
+<span class="fc bfc" id="L76" title="All 4 branches covered.">                    if (LocalDateTime.now().isAfter(LocalDateTime.parse(tokenData[1])) &amp;&amp; LocalDateTime.now().isBefore(LocalDateTime.parse(tokenData[2]))) {</span>
 <span class="fc" id="L77">                        confirmed = true;</span>
                     } else {
 <span class="fc" id="L79">                        confirmed = false;</span>
