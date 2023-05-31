@@ -310,15 +310,11 @@ public class UserServiceTests {
     }
 
     @Test
-    void testAccountExists_AccountFileNotFound_ThrowsIllegalArgumentException() {
+    void testAccountExists_AccountFileNotFound_ReturnsFalse() {
         long id = 10;
         String type = "PHP";
-
-        // Assert
-        assertThrows(IllegalArgumentException.class, () -> {
-            // Act
-            UserService.accountExists(id, type);
-        }, "Account file not found");
+        boolean exists = UserService.accountExists(id, type);
+        assertFalse(exists);
     }
 
     @Test
