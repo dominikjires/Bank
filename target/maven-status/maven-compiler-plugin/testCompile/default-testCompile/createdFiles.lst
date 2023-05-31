@@ -1,0 +1,8 @@
+com/jires/Bank/service/ExchangeRateServiceTests.class
+com/jires/Bank/service/CustomUserDetailsServiceTests.class
+com/jires/Bank/repository/ExchangeRateRepositoryTests.class
+com/jires/Bank/service/CustomUserDetailsServiceTestsImpl.class
+com/jires/Bank/controller/ErrorControllerTests.class
+com/jires/Bank/repository/UserRepositoryTests.class
+com/jires/Bank/service/UserServiceTests.class
+com/jires/Bank/controller/AppControllerTests.class
