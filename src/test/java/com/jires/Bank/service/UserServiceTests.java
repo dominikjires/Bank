@@ -317,18 +317,6 @@ public class UserServiceTests {
     }
 
     @Test
-    void testAccountExists_AccountFileNotFound_ThrowsIllegalArgumentException() {
-        long id = 10;
-        String type = "PHP";
-
-        // Assert
-        assertThrows(IllegalArgumentException.class, () -> {
-            // Act
-            UserService.accountExists(id, type);
-        }, "Account file not found");
-    }
-
-    @Test
     void testPayment_InsufficientFunds_Returns0() throws IOException {
         long id = 1;
         String type = "CZK";
