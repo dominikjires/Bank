@@ -15,6 +15,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static com.jires.Bank.app.service.ExchangeRateService.calculateExchange;
+import static java.lang.Math.abs;
 
 @Service
 public class UserService {
@@ -124,16 +125,23 @@ public class UserService {
             while ((line = reader.readLine()) != null) {
                 // Search for the specified type in the input file
                 if (line.contains(type)) {
-                    // If the specified type is found, update the balance amount
+                    // If the specified type is found and funds are available for payment, update the balance amount
                     String[] parts = line.split(",");
-                    if (Double.parseDouble(parts[1].trim()) - amount < 0) {
-                        break;
-                    } else {
+                    if (Double.parseDouble(parts[1].trim()) - amount > 0) {
                         newAmount = Double.parseDouble(parts[1].trim()) - amount;
                         foundType = true;
                         found = type;
                         // Write the transaction to the log file
                         writeToLog(id,"-",found,amount);
+                    } else if (amount < (Double.parseDouble(parts[1].trim())+Double.parseDouble(parts[1].trim()) * 0.1 )){
+                        // Make an overdraft if the payment does not exceed 10% of the balance
+                        newAmount = Double.parseDouble(parts[1].trim()) - (amount + 0.1 * amount);
+                        foundType = true;
+                        found = type;
+                        // Write the transaction to the log file
+                        writeToLog(id,"-",found,amount + 0.1 * amount);
+                    } else {
+                        break;
                     }
                 }
             }
