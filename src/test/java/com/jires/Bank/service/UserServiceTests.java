@@ -5,11 +5,15 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 import static com.jayway.jsonpath.internal.path.PathCompiler.fail;
+import static com.jires.Bank.app.service.UserService.payment;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class UserServiceTests {
     @BeforeEach
@@ -38,6 +42,149 @@ public class UserServiceTests {
     }
 
     @Test
+    public void testAccountExists_InvalidAccountFileFormat() throws IOException {
+        // Arrange
+        long id = 786;
+        String type = "Savings";
+        String filePath = String.format("data/%d.txt", id);
+        File file = new File(filePath);
+        file.createNewFile(); // Create an empty file
+
+        try (PrintWriter writer = new PrintWriter(file)) {
+            writer.println("InvalidLine"); // Invalid account file format
+        }
+
+        // Act and Assert
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            UserService.accountExists(id, type);
+        });
+
+        assertEquals("Invalid account file format", exception.getMessage());
+
+        // Clean up
+        file.delete();
+    }
+
+    @Test
+    public void testAddAccount_InvalidAccountFileFormat() throws IOException {
+        // Arrange
+        long id = 786;
+        String type = "Savings";
+        double amount = 100.0;
+        String filePath = String.format("data/%d.txt", id);
+        File file = new File(filePath);
+        file.createNewFile(); // Create an empty file
+
+        try (PrintWriter writer = new PrintWriter(file)) {
+            writer.println("InvalidLine"); // Invalid account file format
+        }
+
+        // Act and Assert
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            UserService.addAccount(id, type, amount);
+        });
+
+        assertEquals("Invalid account file format", exception.getMessage());
+
+        // Clean up
+        file.delete();
+    }
+
+    @Test
+    public void testAddAccount_AccountOfTypeAlreadyExists() throws IOException {
+        // Arrange
+        long id = 786;
+        String type = "Savings";
+        double amount = 100.0;
+        String filePath = String.format("data/%d.txt", id);
+        File file = new File(filePath);
+        file.createNewFile(); // Create an empty file
+
+        try (PrintWriter writer = new PrintWriter(file)) {
+            writer.write(type + "," + amount + "\n"); // Add an account of the same type
+        }
+
+        // Act and Assert
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            UserService.addAccount(id, type, amount);
+        });
+
+        assertEquals("Account of type already exists", exception.getMessage());
+
+        // Clean up
+        file.delete();
+    }
+
+    @Test
+    public void testPayment_Overdraft() throws IOException {
+        // Arrange
+        long id = 786;
+        String type = "CZK";
+        double amount = 1.0;
+
+        // Create a temporary input file
+        File inputFile = new File("data/" + id + ".txt");
+        inputFile.createNewFile();
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(inputFile))) {
+            writer.write(type + "," + (amount - 500.0)); // Initial balance with enough funds
+        }
+
+        // Redirect System.err to capture the output
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        PrintStream printStream = new PrintStream(outputStream);
+        PrintStream originalErr = System.err;
+        System.setErr(printStream);
+
+        // Act
+        int result = UserService.payment(id, type, amount);
+
+        // Reset System.err
+        System.err.flush();
+        System.setErr(originalErr);
+
+        // Assert
+        assertFalse(outputStream.toString().contains("Error renaming file"));
+
+        // Clean up
+        inputFile.delete();
+    }
+
+    @Test
+    public void testPayment_ErrorDeletingFile() throws IOException {
+        // Arrange
+        long id = 786;
+        String type = "CZK";
+        double amount = 1000.0;
+
+        // Create a temporary input file
+        File inputFile = new File("data/" + id + ".txt");
+        inputFile.createNewFile();
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(inputFile))) {
+            writer.write(type + "," + amount); // Initial balance
+        }
+
+        // Redirect System.err to capture the output
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        PrintStream printStream = new PrintStream(outputStream);
+        PrintStream originalErr = System.err;
+        System.setErr(printStream);
+
+        // Act
+        int result = UserService.payment(id, type, amount);
+
+        // Reset System.err
+        System.err.flush();
+        System.setErr(originalErr);
+
+        // Assert
+        assertEquals(1, result);
+        assertFalse(outputStream.toString().contains("Error deleting file"));
+
+        // Clean up
+        inputFile.delete();
+    }
+
+    @Test
     public void testDepositMoney() throws IOException {
         boolean success = UserService.depositMoney(50, "CZK", 50);
         Assertions.assertTrue(success);
@@ -46,26 +193,72 @@ public class UserServiceTests {
     @Test
     public void testDepositMoneyExceedingMaxValue() throws IOException {
         boolean success = UserService.depositMoney(1, "CZK", Double.MAX_VALUE-1);
-        Assertions.assertFalse(success);
+        assertFalse(success);
     }
 
     @Test
     public void testPayment() throws IOException {
-        int result = UserService.payment(50, "CZK", 20);
-        Assertions.assertEquals(1, result);
+        int result = payment(50, "CZK", 20);
+        assertEquals(1, result);
     }
 
     @Test
+    void testPaymentWithSufficientFunds() throws IOException {
+        // Arrange
+        long id = 1;
+        String type = "CZK";
+        double amount = 10.0;
+
+        // Act
+        int result = payment(id, type, amount);
+
+        // Assert
+        assertEquals(1, result);
+        // Add additional assertions if needed
+    }
+
+    @Test
+    void testPaymentWithAllowedOverdraft() throws IOException {
+        // Arrange
+        long id = 1;
+        String type = "CZK";
+        double amount = 2.0;
+
+        // Act
+        int result = payment(id, type, amount);
+
+        // Assert
+        assertEquals(1, result);
+        // Add additional assertions if needed
+    }
+
+    @Test
+    void testPaymentWithExceededOverdraft() throws IOException {
+        // Arrange
+        long id = 1;
+        String type = "EUR";
+        double amount = 100000.0;
+
+        // Act
+        int result = payment(id, type, amount);
+
+        // Assert
+        assertEquals(1, result);
+        // Add additional assertions if needed
+    }
+
+
+    @Test
     public void testPaymentInsufficientFunds() throws IOException {
-        int result = UserService.payment(50, "CZK", 1000);
-        Assertions.assertEquals(1, result);
+        int result = payment(50, "CZK", 1000);
+        assertEquals(1, result);
     }
 
     @Test
     public void testReadLog() {
         List<String> log = UserService.readLog(50);
         Assertions.assertNotNull(log);
-        Assertions.assertFalse(log.isEmpty());
+        assertFalse(log.isEmpty());
     }
 
     @Test
@@ -77,27 +270,27 @@ public class UserServiceTests {
 
     @Test
     public void testAddDuplicateAccount() {
-        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+        assertThrows(IllegalArgumentException.class, () -> {
             UserService.addAccount(1, "CZK", 1000);
         });
     }
 
     @Test
     public void testPaymentWithConversion() throws IOException {
-        int result = UserService.payment(1, "USD", 10);
-        Assertions.assertEquals(1, result);
+        int result = payment(1, "USD", 10);
+        assertEquals(1, result);
     }
 
     @Test
     public void testPaymentInvalidCurrency() throws IOException {
-        int result = UserService.payment(1, "EUR", 50);
-        Assertions.assertEquals(1, result);
+        int result = payment(1, "EUR", 50);
+        assertEquals(1, result);
     }
 
     @Test
     public void testDepositMoneyInvalidAccount() throws IOException {
         boolean success = UserService.depositMoney(999, "USD", 100);
-        Assertions.assertFalse(success);
+        assertFalse(success);
     }
 
     @Test
@@ -112,16 +305,20 @@ public class UserServiceTests {
         long id = 10;
         String type = "CZK";
         double amount = 1000;
-        int result = UserService.payment(id, type, amount);
-        Assertions.assertEquals(0, result);
+        int result = payment(id, type, amount);
+        assertEquals(0, result);
     }
 
     @Test
-    void testAccountExists_AccountFileNotFound_ReturnsFalse() {
+    void testAccountExists_AccountFileNotFound_ThrowsIllegalArgumentException() {
         long id = 10;
-        String type = "HUF";
-        boolean exists = UserService.accountExists(id, type);
-        Assertions.assertFalse(exists);
+        String type = "PHP";
+
+        // Assert
+        assertThrows(IllegalArgumentException.class, () -> {
+            // Act
+            UserService.accountExists(id, type);
+        }, "Account file not found");
     }
 
     @Test
@@ -129,8 +326,8 @@ public class UserServiceTests {
         long id = 10;
         String type = "CZK";
         double amount = 1000;
-        int result = UserService.payment(id, type, amount);
-        Assertions.assertEquals(0, result);
+        int result = payment(id, type, amount);
+        assertEquals(0, result);
     }
 
     @Test
@@ -138,8 +335,8 @@ public class UserServiceTests {
         long id = 50;
         String type = "CZK";
         double amount = 50;
-        int result = UserService.payment(id, type, amount);
-        Assertions.assertEquals(1, result);
+        int result = payment(id, type, amount);
+        assertEquals(1, result);
     }
 
     @Test
@@ -151,7 +348,7 @@ public class UserServiceTests {
         UserService.writeToLog(id, type, currency, amount);
         List<String> log = UserService.readLog(id);
         Assertions.assertNotNull(log);
-        Assertions.assertFalse(log.isEmpty());
+        assertFalse(log.isEmpty());
         Assertions.assertTrue(log.get(log.size() - 1).contains(currency));
     }
 
@@ -168,7 +365,7 @@ public class UserServiceTests {
         long id = 1;
         String type = "CZK";
         double amount = 1000;
-        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+        assertThrows(IllegalArgumentException.class, () -> {
             UserService.addAccount(id, type, amount);
         });
     }
@@ -178,7 +375,7 @@ public class UserServiceTests {
         long id = -1;
         String type = "USD";
         double amount = 500;
-        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+        assertThrows(IllegalArgumentException.class, () -> {
             UserService.addAccount(id, type, amount);
         });
     }
@@ -188,7 +385,7 @@ public class UserServiceTests {
         long id = 2;
         String type = "USD";
         double amount = -500;
-        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+        assertThrows(IllegalArgumentException.class, () -> {
             UserService.addAccount(id, type, amount);
         });
     }
@@ -215,8 +412,8 @@ public class UserServiceTests {
         }
         UserService.writeToLog(id, type, currency, amount);
         List<String> log = UserService.readLog(id);
-        Assertions.assertEquals(5, log.size());
-        Assertions.assertFalse(log.contains("2023-05-18 14:30 + USD 100"));
+        assertEquals(5, log.size());
+        assertFalse(log.contains("2023-05-18 14:30 + USD 100"));
     }
 
     @Test
@@ -224,7 +421,7 @@ public class UserServiceTests {
         long accountId = 999;
         String accountType = "USD";
 
-        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+        assertThrows(IllegalArgumentException.class, () -> {
             UserService.accountExists(accountId, accountType);
         });
     }
@@ -234,7 +431,7 @@ public class UserServiceTests {
         long accountId = 50;
         String nullType = null;
         boolean exists = UserService.accountExists(accountId, nullType);
-        Assertions.assertFalse(exists);
+        assertFalse(exists);
     }
 
     @Test
@@ -253,7 +450,7 @@ public class UserServiceTests {
         long id = 50;
         List<String> log = UserService.readLog(id);
         Assertions.assertNotNull(log);
-        Assertions.assertFalse(log.isEmpty());
+        assertFalse(log.isEmpty());
     }
 
     @Test
