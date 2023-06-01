@@ -33,14 +33,11 @@ jobs:
 
     - name: Commit and push the badge (if it changed)
       run: |
-        git config --global user.name 'dominikjires'
-        git config --global user.email 'jiresdom@gmail.com'
+        git config --global user.name 'github_actions'
+        git config --global user.email 'github_actions@example.com'
         git add '*.svg'
         git commit -m "commit badge"
-        git stash
-        git pull
-        git stash pop || true
-        git push
+        git push || true
 
     - name: Upload JaCoCo coverage report
       uses: actions/upload-artifact@v2
