@@ -37,7 +37,7 @@ jobs:
         git config --global user.email 'jiresdom@gmail.com'
         git add '*.svg'
         git commit -m "commit badge"
-        git pull origin main
+        git pull --no-rebase
         git push
 
     - name: Upload JaCoCo coverage report
